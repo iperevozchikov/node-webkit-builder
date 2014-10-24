@@ -1,4 +1,5 @@
 var test = require('tape');
+var testSetup = require('redtape');
 var temp = require('temp');
 var fs   = require('fs');
 var path = require('path');
@@ -130,7 +131,11 @@ test('should zip the app and create the app.nw file + log it', function (t) {
 
 });
 
-test('should zip but use platform-specific manifest with overrides in package.json', function (t) {
+testSetup({
+    afterEach: function(done){
+        del('./test/temp/platform-specific-unzipped', done);
+    }
+})('should zip but use platform-specific manifest with overrides in package.json', function (t) {
     t.plan(3);
 
     var files = [{
@@ -148,16 +153,11 @@ test('should zip but use platform-specific manifest with overrides in package.js
 
     utils.generateZipFile(files, _evt, expectedPackage).then(function(nwfile) {
         var unzipper = new DecompressZip(nwfile),
-            unzipDestination = 'test/temp/platform-specific-unzipped',
-            cleanUp = function(){
-                del(unzipDestination);
-            };
-
-        unzipper.on('error', cleanUp);
+            unzipDestination = 'test/temp/platform-specific-unzipped';
 
         unzipper.on('extract', function (log) {
             t.equal(fs.readFileSync(path.join(unzipDestination, 'package.json')).toString(), expectedPackage);
-            cleanUp();
+            t.end();
         });
 
         unzipper.extract({

@@ -201,8 +201,8 @@ test('Should not zip mac apps by default', function (t) {
 
 
 testSetup({
-    afterEach: function(){
-        del('./test/temp/oneOverridenRestNot');
+    afterEach: function(done){
+        del('./test/temp/oneOverridenRestNot', done);
     }
 })('Should write package.json with platform overrides for (unzipped) Mac build', function (t) {
     t.plan(1);
@@ -227,5 +227,6 @@ testSetup({
                 )).toString()),
                 JSON.parse(fs.readFileSync('./test/expected/oneOveriddenRestNot/osx.json').toString())
             );
+            t.end();
         });
 });
