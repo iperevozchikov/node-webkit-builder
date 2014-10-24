@@ -6,5 +6,8 @@
         "frame": true,
         "toolbar": false
     },
-    "frame": false
+    "frame": false,
+    "x": {},
+    "abc": [],
+    "def": {}
 }

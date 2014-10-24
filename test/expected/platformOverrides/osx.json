@@ -5,5 +5,8 @@
     "window": {
         "frame": false,
         "toolbar": false
-    }
+    },
+    "x": ["y", "z"],
+    "abc": 2,
+    "def": {}
 }

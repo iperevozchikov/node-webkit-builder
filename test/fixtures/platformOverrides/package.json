@@ -6,24 +6,34 @@
         "frame": false,
         "toolbar": false
     },
+    "x": ["y"],
+    "abc": [],
+    "def": {},
     "platformOverrides": {
         "win": {
             "window": {
                 "frame": true
-            }
+            },
+            "x": ["z"],
+            "abc": [1],
+            "def": {"x":1}
         },
         "osx": {
-            "main": "other.html"
+            "main": "other.html",
+            "x": ["y", "z"],
+            "abc": 2
         },
         "linux32": {
             "main": "another.html",
             "window": {
                 "frame": true
             },
-            "frame": false
+            "frame": false,
+            "x": {}
         },
         "linux64": {
-            "window": {}
+            "window": {},
+            "x": []
         }
     }
 }
