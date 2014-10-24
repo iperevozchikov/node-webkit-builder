@@ -65,7 +65,7 @@ test('Should check if we have some files: rejection', function (t) {
 
 });
 
-test('Should apply platform-specific overrides  correctly', function (t) {
+test('Should apply platform-specific overrides correctly', function (t) {
     t.plan(4);
 
     var x = new NwBuilder({
@@ -81,6 +81,78 @@ test('Should apply platform-specific overrides  correctly', function (t) {
             t.deepEqual(platform.platformSpecificManifest, JSON.parse(file.toString()), platformName + '.json');
         });
     });
+});
+
+test('Should only create one ZIP if there are no platform-specific overrides', function (t) {
+    t.plan(11);
+
+    var x = new NwBuilder({
+        files: './test/fixtures/nwapp/**/*',
+        platforms: ['osx', 'win', 'linux32', 'linux64'],
+        macZip: true
+    });
+
+    x.checkFiles().bind(x)
+        .then(x.preparePlatformSpecificManifests)
+        .then(x.zipAppFiles)
+        .then(function () {
+            _.forEach(x._zips, function(zip, platformName){
+                t.equal(zip.platformSpecific, false, platformName + ' should be marked as platform specific');
+                t.equal(!!zip.file, true, platformName + " ZIP file property should exist");
+            });
+
+            t.deepEqual(x._zips.osx, x._zips.win, 'OSX ZIP should be equal to the Windows one');
+            t.deepEqual(x._zips.win, x._zips.linux32, 'Windows ZIP should be equal to the Linux 32 one');
+            t.deepEqual(x._zips.linux32, x._zips.linux64, 'Linux 32 ZIP should be equal to the Linux 64 one');
+        });
+});
+
+test('Should create a ZIP per platform if every platform has overrides', function (t) {
+    t.plan(11);
+
+    var x = new NwBuilder({
+        files: './test/fixtures/platformOverrides/**/*',
+        platforms: ['osx', 'win', 'linux32', 'linux64'],
+        macZip: true
+    });
+
+    x.checkFiles().bind(x)
+        .then(x.preparePlatformSpecificManifests)
+        .then(x.zipAppFiles)
+        .then(function () {
+            _.forEach(x._zips, function(zip, platformName){
+                t.equal(zip.platformSpecific, true, platformName + ' should be marked as platform specific');
+                t.equal(!!zip.file, true, platformName + " ZIP file property should exist");
+            });
+
+            t.notDeepEqual(x._zips.osx, x._zips.win, "OSX ZIP should be different to the Windows one");
+            t.notDeepEqual(x._zips.win, x._zips.linux32, "Windows ZIP should be different to the Linux 32 one");
+            t.notDeepEqual(x._zips.linux32, x._zips.linux64, "Linux 32 ZIP should be different to the Linux 64 one");
+        });
+});
+
+test('Should create a ZIP per platform which has overrides and one between the rest', function (t) {
+    t.plan(11);
+
+    var x = new NwBuilder({
+        files: './test/fixtures/oneOveriddenRestNot/**/*',
+        platforms: ['osx', 'win', 'linux32', 'linux64'],
+        macZip: true
+    });
+
+    x.checkFiles().bind(x)
+        .then(x.preparePlatformSpecificManifests)
+        .then(x.zipAppFiles)
+        .then(function () {
+            _.forEach(x._zips, function(zip, platformName){
+                t.equal(zip.platformSpecific, platformName === 'win', platformName + ' should be marked as platform specific');
+                t.equal(!!zip.file, true, platformName + " ZIP file property should exist");
+            });
+
+            t.notDeepEqual(x._zips.osx, x._zips.win, "OSX ZIP should be different to the Windows one");
+            t.deepEqual(x._zips.osx, x._zips.linux32, "OSX ZIP should be equal to the Linux 32 one");
+            t.deepEqual(x._zips.linux32, x._zips.linux64, "Linux 32 ZIP should be equal to the Linux 64 one");
+        });
 });
 
 test('Should find latest version', function (t) {
