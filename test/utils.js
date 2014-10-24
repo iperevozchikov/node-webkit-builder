@@ -7,7 +7,7 @@ var utils = require('./../lib/utils');
 var DecompressZip = require('decompress-zip');
 var _ = require('lodash');
 var EventEmitter = require('events').EventEmitter;
-var del = require('del');
+var del = require('rimraf');
 
 test('getPackageInfo invalid', function (t) {
     t.plan(1);
